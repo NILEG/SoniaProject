@@ -1,22 +1,19 @@
 import express from "express";
 import OpenAI from "openai";
 import dotenv from "dotenv";
+import cors from "cors";
 
-// Load environment variables
 dotenv.config();
 
-// Initialize Express app
 const app = express();
 
-// Configure Express
+app.use(cors());
 app.use(express.json());
 
-// Initialize OpenAI
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// API 1: Generate a story from an image URL
 app.post("/api/generate-story", async (req, res) => {
   try {
     const { imageUrl } = req.body;
@@ -25,7 +22,6 @@ app.post("/api/generate-story", async (req, res) => {
       return res.status(400).json({ error: "Image URL is required" });
     }
 
-    // Call OpenAI API to generate story from image
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
@@ -58,7 +54,6 @@ app.post("/api/generate-story", async (req, res) => {
   }
 });
 
-// API 2: Convert story to speech and return audio file
 app.post("/api/text-to-speech", async (req, res) => {
   try {
     const { text, voice = "coral" } = req.body;
@@ -92,7 +87,6 @@ app.post("/api/text-to-speech", async (req, res) => {
   }
 });
 
-// Add a simple GET endpoint for health check
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
